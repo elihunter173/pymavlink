@@ -358,9 +358,11 @@ class %s(MAVLink_message):
         def pack(self, mav, force_mavlink1=False):
                 return MAVLink_message.pack(self, mav, %u, struct.pack('%s'""" % (m.crc_extra, m.fmtstr))
         for field in m.ordered_fields:
-                if (field.type != "char" and field.array_length > 1):
+                if field.type != "char" and field.array_length > 1:
                         for i in range(field.array_length):
                                 outf.write(", self.{0:s}[{1:d}]".format(field.name, i))
+                if field.type == 'char' and field.array_length > 1:
+                        outf.write(", self.{0:s}.encode('utf-8')".format(field.name))
                 else:
                         outf.write(", self.{0:s}".format(field.name))
         outf.write("), force_mavlink1=force_mavlink1)\n")
